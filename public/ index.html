@@ -1,1 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titan Proxy</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        #nav { background: #333; padding: 10px; display: flex; gap: 10px; }
+        input { flex-grow: 1; padding: 8px; border-radius: 4px; border: none; }
+        button { padding: 8px 15px; cursor: pointer; background: #ffca28; border: none; font-weight: bold; }
+        iframe { flex-grow: 1; border: none; width: 100%; }
+    </style>
+</head>
+<body>
 
+<div id="nav">
+    <input type="text" id="urlInput" placeholder="Enter URL (e.g., https://example.com)">
+    <button onclick="launchProxy()">Go</button>
+</div>
+
+<iframe id="proxyFrame"></iframe>
+
+<script>
+    function launchProxy() {
+        const target = document.getElementById('urlInput').value;
+        if (!target) return alert("Please enter a URL");
+
+        // REPLACE THIS URL with your deployed Firebase Function URL
+        const proxyBase = "https://us-central1-titan-84c56.cloudfunctions.net/proxy?url=";
+        
+        document.getElementById('proxyFrame').src = proxyBase + encodeURIComponent(target);
+    }
+</script>
+
+</body>
+</html>
