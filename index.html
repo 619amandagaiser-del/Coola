@@ -1,142 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Titan Hub & Proxy</title>
+    <title>Titan Hub</title>
     <style>
-        :root { --bg: #0f172a; --nav: #1e293b; --accent: #3b82f6; --text: #f8fafc; }
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        header { background: var(--nav); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); z-index: 10; }
-        h1 { margin: 0; font-size: 1.5rem; cursor: pointer; }
-        .proxy-bar { display: flex; gap: 10px; flex-grow: 1; max-width: 600px; margin-left: 20px; }
-        .proxy-bar input { flex-grow: 1; padding: 10px 15px; border-radius: 20px; border: none; outline: none; background: #334155; color: white; }
-        .proxy-bar button { padding: 10px 20px; border-radius: 20px; border: none; background: var(--accent); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .proxy-bar button:hover { background: #2563eb; }
-        
-        #content-area { flex-grow: 1; position: relative; }
-        #game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding: 20px; overflow-y: auto; height: 100%; box-sizing: border-box; }
-        .game-card { background: var(--nav); padding: 15px; border-radius: 10px; text-align: center; cursor: pointer; transition: transform 0.2s, background 0.2s; }
-        .game-card:hover { transform: translateY(-5px); background: #334155; }
-        .game-icon { width: 50px; height: 50px; background: var(--accent); border-radius: 10px; margin: 0 auto 10px auto; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        
-        #viewport { display: none; width: 100%; height: 100%; border: none; background: white; }
+        body { background: #0b0e14; color: #c9d1d9; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        nav { background: #161b22; padding: 10px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #30363d; }
+        input { flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #30363d; background: #0d1117; color: white; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding: 20px; overflow-y: auto; }
+        .card { background: #161b22; border: 1px solid #30363d; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; }
+        .card:hover { border-color: #58a6ff; }
+        iframe { flex: 1; border: none; display: none; background: white; }
     </style>
 </head>
 <body>
+    <nav>
+        <div onclick="location.reload()" style="cursor:pointer; font-weight:bold; color:#58a6ff;">TITAN</div>
+        <input type="text" id="url" placeholder="Enter URL or search games...">
+        <button onclick="launch()">Go</button>
+    </nav>
+    <div id="game-grid" class="grid">Loading Games...</div>
+    <iframe id="view"></iframe>
 
-<header>
-    <h1 onclick="showHome()">🚀 Titan Hub</h1>
-    <div class="proxy-bar">
-        <input type="text" id="urlInput" placeholder="Enter a URL to unblock (e.g., https://google.com)">
-        <button onclick="launchProxy()">Browse</button>
-    </div>
-</header>
+    <script>
+        const MONKEY_REPO = "https://raw.githubusercontent.com/MonkeyGG2/monkeygg2.github.io/main";
 
-<div id="content-area">
-    <div id="game-grid">
-        </div>
-    <iframe id="viewport" src=""></iframe>
-</div>
+        async function loadGames() {
+            const res = await fetch(`${MONKEY_REPO}/config.jsonc`);
+            const text = await res.text();
+            const data = JSON.parse(text.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, ""));
+            
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = "";
+            Object.keys(data.games).forEach(name => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `🎮<br><b>${name}</b>`;
+                div.onclick = () => openGame(`${MONKEY_REPO}/games/${data.games[name].path}`);
+                grid.appendChild(div);
+            });
+        }
 
-<script>
-    // Proxy Functionality
-    function launchProxy() {
-        let url = document.getElementById('urlInput').value.trim();
-        if (!url) return;
-        if (!url.startsWith('http')) url = 'https://' + url;
-        
-        // This MUST point to your Firebase setup, e.g., /p?url=
-        // If you haven't fixed the backend yet, this will still 404.
-        const proxyUrl = `/p?url=${encodeURIComponent(url)}`; 
-        
-        document.getElementById('game-grid').style.display = 'none';
-        const iframe = document.getElementById('viewport');
-        iframe.style.display = 'block';
-        iframe.src = proxyUrl;
-    }
+        function openGame(url) {
+            document.getElementById('game-grid').style.display = 'none';
+            const frame = document.getElementById('view');
+            frame.style.display = 'block';
+            // Route through your internal proxy to bypass CORS
+            frame.src = `/p?url=${encodeURIComponent(url)}`;
+        }
 
-    function showHome() {
-        document.getElementById('viewport').style.display = 'none';
-        document.getElementById('viewport').src = "";
-        document.getElementById('game-grid').style.display = 'grid';
-    }
+        function launch() {
+            const val = document.getElementById('url').value;
+            if (val) openGame(val.startsWith('http') ? val : 'https://' + val);
+        }
 
-    function launchGame(url) {
-        document.getElementById('game-grid').style.display = 'none';
-        const iframe = document.getElementById('viewport');
-        iframe.style.display = 'block';
-        iframe.src = url;
-    }
-
-    // 50 Games Array
-    const games = [
-        { name: "2048", url: "https://play2048.co/", icon: "🔢" },
-        { name: "Flappy Bird", url: "https://flappybird.io/", icon: "🐦" },
-        { name: "Pac-Man", url: "https://freepacman.org/", icon: "🟡" },
-        { name: "Tetris", url: "https://tetris.com/play-tetris", icon: "🧱" },
-        { name: "Slither.io", url: "https://slither.io/", icon: "🐍" },
-        { name: "Agar.io", url: "https://agar.io/", icon: "🦠" },
-        { name: "Hole.io", url: "https://hole-io.com/", icon: "🕳️" },
-        { name: "Paper.io 2", url: "https://paper-io.com/", icon: "🧻" },
-        { name: "Krunker", url: "https://krunker.io/", icon: "🔫" },
-        { name: "Skribbl.io", url: "https://skribbl.io/", icon: "✏️" },
-        { name: "Shell Shockers", url: "https://shellshock.io/", icon: "🥚" },
-        { name: "Surviv.io", url: "https://surviv.io/", icon: "🪖" },
-        { name: "Venge.io", url: "https://venge.io/", icon: "🎯" },
-        { name: "Zombs Royale", url: "https://zombsroyale.io/", icon: "🧟" },
-        { name: "Little Alchemy", url: "https://littlealchemy.com/", icon: "⚗️" },
-        { name: "Little Alchemy 2", url: "https://littlealchemy2.com/", icon: "🧪" },
-        { name: "Wordle", url: "https://www.nytimes.com/games/wordle/index.html", icon: "🔤" },
-        { name: "Cookie Clicker", url: "https://orteil.dashnet.org/cookieclicker/", icon: "🍪" },
-        { name: "Geometry Dash", url: "https://geometrydash.io/", icon: "🟩" },
-        { name: "Subway Surfers", url: "https://subwaysurfers.com/", icon: "🏃" },
-        { name: "Temple Run", url: "https://templerun.com/", icon: "🏃‍♂️" },
-        { name: "Crossy Road", url: "https://poki.com/en/g/crossy-road", icon: "🐔" },
-        { name: "Minecraft Classic", url: "https://classic.minecraft.net/", icon: "⛏️" },
-        { name: "Retro Bowl", url: "https://poki.com/en/g/retro-bowl", icon: "🏈" },
-        { name: "Drive Mad", url: "https://poki.com/en/g/drive-mad", icon: "🚙" },
-        { name: "Stickman Hook", url: "https://poki.com/en/g/stickman-hook", icon: "🪝" },
-        { name: "Monkey Mart", url: "https://poki.com/en/g/monkey-mart", icon: "🐒" },
-        { name: "Moto X3M", url: "https://poki.com/en/g/moto-x3m", icon: "🏍️" },
-        { name: "Vampire Survivors", url: "https://poncle.itch.io/vampire-survivors", icon: "🧛" },
-        { name: "Friday Night Funkin'", url: "https://ninja-muffin24.itch.io/funkin", icon: "🎤" },
-        { name: "Chess.com", url: "https://www.chess.com/play/computer", icon: "♟️" },
-        { name: "Lichess", url: "https://lichess.org/", icon: "♞" },
-        { name: "Minesweeper", url: "https://minesweeperonline.com/", icon: "💣" },
-        { name: "Solitaire", url: "https://www.google.com/logos/fnbx/solitaire/standalone.html", icon: "🃏" },
-        { name: "Snake", url: "https://www.google.com/search?q=play+snake", icon: "🐍" },
-        { name: "Tic Tac Toe", url: "https://playtictactoe.org/", icon: "❌" },
-        { name: "Checkers", url: "https://www.247checkers.com/", icon: "🔴" },
-        { name: "Connect 4", url: "https://c4arena.com/", icon: "🟡" },
-        { name: "Battleship", url: "https://battleship-game.org/", icon: "🚢" },
-        { name: "Dinosaur Game", url: "https://chromedino.com/", icon: "🦖" },
-        { name: "Super Mario 64", url: "https://sm64web.com/", icon: "🍄" },
-        { name: "Doom", url: "https://dos.zone/doom-dec-1993/", icon: "🔫" },
-        { name: "Quake", url: "https://www.netquake.io/", icon: "💥" },
-        { name: "Wolfenstein 3D", url: "https://wolf3d.net/", icon: "🏰" },
-        { name: "Oregon Trail", url: "https://classicreload.com/oregon-trail.html", icon: "wagon" },
-        { name: "Space Invaders", url: "https://freekong.org/invaders/", icon: "👾" },
-        { name: "Asteroids", url: "https://freeasteroids.org/", icon: "☄️" },
-        { name: "Pong", url: "https://ponggame.org/", icon: "🏓" },
-        { name: "Breakout", url: "https://elgoog.im/breakout/", icon: "🧱" },
-        { name: "Frogger", url: "https://froggerclassic.appspot.com/", icon: "🐸" }
-    ];
-
-    // Build the Game Grid
-    const grid = document.getElementById('game-grid');
-    games.forEach(game => {
-        const card = document.createElement('div');
-        card.className = 'game-card';
-        card.onclick = () => launchGame(game.url);
-        
-        card.innerHTML = `
-            <div class="game-icon">${game.icon}</div>
-            <div style="font-weight: bold;">${game.name}</div>
-        `;
-        grid.appendChild(card);
-    });
-</script>
-
+        loadGames();
+    </script>
 </body>
 </html>
