@@ -1,59 +1,273 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" data-theme="dark">
 <head>
-    <title>Titan Hub</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coola OS</title>
     <style>
-        body { background: #0b0e14; color: #c9d1d9; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
-        nav { background: #161b22; padding: 10px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #30363d; }
-        input { flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #30363d; background: #0d1117; color: white; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding: 20px; overflow-y: auto; }
-        .card { background: #161b22; border: 1px solid #30363d; padding: 15px; border-radius: 8px; text-align: center; cursor: pointer; }
-        .card:hover { border-color: #58a6ff; }
-        iframe { flex: 1; border: none; display: none; background: white; }
+        /* Feature 7 & 9: Themes and Glassmorphism */
+        :root[data-theme="dark"] { --bg: #0f172a; --surface: rgba(30, 41, 59, 0.7); --border: rgba(255,255,255,0.1); --accent: #38bdf8; --text: #f8fafc; }
+        :root[data-theme="ocean"] { --bg: #082f49; --surface: rgba(12, 74, 110, 0.7); --border: rgba(56,189,248,0.2); --accent: #0ea5e9; --text: #e0f2fe; }
+        :root[data-theme="hacker"] { --bg: #000000; --surface: rgba(0, 20, 0, 0.8); --border: #00ff00; --accent: #00ff00; --text: #00ff00; }
+
+        body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; transition: background 0.5s; }
+        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        /* Feature 1: Sidebar Dashboard */
+        aside { width: 260px; background: var(--surface); backdrop-filter: blur(12px); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
+        .logo { font-size: 2rem; font-weight: 900; color: var(--accent); margin-bottom: 30px; cursor: pointer; letter-spacing: -1px; text-shadow: 0 0 10px rgba(56,189,248,0.3); }
+        .nav-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: opacity(0.6); margin: 20px 0 10px 0; font-weight: bold; }
+        .nav-btn { background: transparent; border: none; color: var(--text); padding: 10px 15px; text-align: left; border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; font-size: 1rem; width: 100%; }
+        .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,0.1); color: var(--accent); }
+        
+        /* Feature 8: Clock Widget */
+        #clock { margin-top: auto; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; text-align: center; font-size: 1.2rem; font-weight: bold; font-variant-numeric: tabular-nums; border: 1px solid var(--border); }
+
+        /* Main Content Area */
+        main { flex: 1; display: flex; flex-direction: column; position: relative; }
+        header { padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: var(--surface); backdrop-filter: blur(12px); z-index: 10; }
+        
+        /* Feature 10: Smart Search */
+        .search-box { flex: 1; max-width: 600px; display: flex; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        .search-box input { flex: 1; background: transparent; border: none; padding: 12px 20px; color: var(--text); outline: none; font-size: 1rem; }
+        
+        .content-scroll { flex: 1; overflow-y: auto; padding: 30px; }
+        .section-title { font-size: 1.5rem; margin-bottom: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; backdrop-filter: blur(8px); }
+        .card:hover { transform: translateY(-8px) scale(1.02); border-color: var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .card i { font-size: 3rem; margin-bottom: 15px; display: block; }
+        .card span { font-weight: 600; font-size: 0.9rem; }
+        
+        /* Feature 3: Favorites Star */
+        .fav-btn { position: absolute; top: 10px; right: 10px; font-size: 1.2rem; background: none; border: none; cursor: pointer; opacity: 0.3; transition: 0.2s; }
+        .card:hover .fav-btn { opacity: 1; }
+        .fav-btn.active { opacity: 1; color: #fbbf24; text-shadow: 0 0 10px #fbbf24; }
+
+        /* Feature 6: Iframe & Fullscreen */
+        #player { display: none; flex: 1; position: relative; background: #000; flex-direction: column; }
+        #player-controls { padding: 10px 20px; background: #0f172a; display: flex; gap: 10px; justify-content: space-between; border-bottom: 1px solid #334155; }
+        iframe { flex: 1; border: none; background: #fff; width: 100%; height: 100%; }
+        .btn-action { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 15px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .btn-action:hover { background: var(--accent); color: #000; }
+        
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <nav>
-        <div onclick="location.reload()" style="cursor:pointer; font-weight:bold; color:#58a6ff;">TITAN</div>
-        <input type="text" id="url" placeholder="Enter URL or search games...">
-        <button onclick="launch()">Go</button>
-    </nav>
-    <div id="game-grid" class="grid">Loading Games...</div>
-    <iframe id="view"></iframe>
 
-    <script>
-        const MONKEY_REPO = "https://raw.githubusercontent.com/MonkeyGG2/monkeygg2.github.io/main";
+<aside>
+    <div class="logo" onclick="switchTab('all')">COOLA</div>
+    
+    <div class="nav-label">Library</div>
+    <button class="nav-btn active" onclick="switchTab('all')">🎮 All Games</button>
+    <button class="nav-btn" onclick="switchTab('favs')">⭐ Favorites</button>
+    <button class="nav-btn" onclick="switchTab('recent')">🕒 Recent</button>
+    
+    <div class="nav-label">Quick Web Apps</div>
+    <button class="nav-btn" onclick="launchProxy('https://youtube.com')">▶️ YouTube</button>
+    <button class="nav-btn" onclick="launchProxy('https://discord.com/app')">💬 Discord</button>
+    <button class="nav-btn" onclick="launchProxy('https://open.spotify.com')">🎵 Spotify</button>
 
-        async function loadGames() {
-            const res = await fetch(`${MONKEY_REPO}/config.jsonc`);
-            const text = await res.text();
-            const data = JSON.parse(text.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, ""));
+    <div class="nav-label">Settings</div>
+    <button class="nav-btn" onclick="cycleTheme()">🎨 Change Theme</button>
+
+    <div id="clock">00:00:00</div>
+</aside>
+
+<main>
+    <header id="top-header">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search a game or enter a URL to proxy..." onkeyup="handleSearch(event)">
+        </div>
+        <div style="font-size: 0.8rem; opacity: 0.5;">Press <b>]</b> for Panic</div>
+    </header>
+
+    <div id="dashboard" class="content-scroll">
+        <h2 class="section-title" id="tab-title">🎮 All Games</h2>
+        <div id="game-grid" class="grid">
+            <p style="grid-column: 1/-1;">Syncing Coola Network...</p>
+        </div>
+    </div>
+
+    <div id="player">
+        <div id="player-controls">
+            <div>
+                <button class="btn-action" onclick="closePlayer()">← Exit Game</button>
+                <button class="btn-action" onclick="document.getElementById('game-frame').src += ''">↻ Reload</button>
+            </div>
+            <button class="btn-action" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+        </div>
+        <iframe id="game-frame" allowfullscreen></iframe>
+    </div>
+</main>
+
+<script>
+    // System Variables
+    const REPOS = [
+        "https://raw.githubusercontent.com/MonkeyGG2/monkeygg2.github.io/main",
+        "https://raw.githubusercontent.com/619amandagaiser-del/Coola/main"
+    ];
+    let allGames = [];
+    let favorites = JSON.parse(localStorage.getItem('coolaFavs')) || [];
+    let recents = JSON.parse(localStorage.getItem('coolaRecent')) || [];
+    let currentTab = 'all';
+
+    // Core Initialization
+    async function init() {
+        startClock();
+        const grid = document.getElementById('game-grid');
+        grid.innerHTML = "";
+
+        for (const repo of REPOS) {
+            try {
+                const res = await fetch(`${repo}/config.jsonc`);
+                const text = await res.text();
+                const data = JSON.parse(text.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, ""));
+                
+                if (data.games) {
+                    Object.keys(data.games).forEach(title => {
+                        // Prevent duplicates
+                        if(!allGames.find(g => g.title === title)) {
+                            allGames.push({ title: title, url: `${repo}/games/${data.games[title].path}` });
+                        }
+                    });
+                }
+            } catch (e) { console.error("Sync failed:", repo); }
+        }
+        renderGrid(allGames);
+    }
+
+    // Grid Renderer
+    function renderGrid(list) {
+        const grid = document.getElementById('game-grid');
+        grid.innerHTML = "";
+        const emojis = ["🎮", "🕹️", "⚡", "👾", "🏎️", "🧩"];
+
+        if(list.length === 0) {
+            grid.innerHTML = "<p>No games found here.</p>"; return;
+        }
+
+        list.forEach(game => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            const isFav = favorites.includes(game.title);
+            const emoji = emojis[Math.abs(game.title.length) % emojis.length]; // Consistent pseudo-random emoji
             
-            const grid = document.getElementById('game-grid');
-            grid.innerHTML = "";
-            Object.keys(data.games).forEach(name => {
-                const div = document.createElement('div');
-                div.className = 'card';
-                div.innerHTML = `🎮<br><b>${name}</b>`;
-                div.onclick = () => openGame(`${MONKEY_REPO}/games/${data.games[name].path}`);
-                grid.appendChild(div);
-            });
-        }
+            card.innerHTML = `
+                <button class="fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav(event, '${game.title}')">★</button>
+                <i>${emoji}</i>
+                <span>${game.title}</span>
+            `;
+            card.onclick = () => launchGame(game);
+            grid.appendChild(card);
+        });
+    }
 
-        function openGame(url) {
-            document.getElementById('game-grid').style.display = 'none';
-            const frame = document.getElementById('view');
-            frame.style.display = 'block';
-            // Route through your internal proxy to bypass CORS
-            frame.src = `/p?url=${encodeURIComponent(url)}`;
+    // Feature 3: Favorites Logic
+    function toggleFav(e, title) {
+        e.stopPropagation(); // Prevent launching game
+        if (favorites.includes(title)) {
+            favorites = favorites.filter(f => f !== title);
+            e.target.classList.remove('active');
+        } else {
+            favorites.push(title);
+            e.target.classList.add('active');
         }
+        localStorage.setItem('coolaFavs', JSON.stringify(favorites));
+        if(currentTab === 'favs') switchTab('favs');
+    }
 
-        function launch() {
-            const val = document.getElementById('url').value;
-            if (val) openGame(val.startsWith('http') ? val : 'https://' + val);
+    // Feature 4: Recent Games Logic
+    function addToRecent(game) {
+        recents = recents.filter(g => g.title !== game.title); // Remove if exists
+        recents.unshift(game); // Add to front
+        if(recents.length > 10) recents.pop(); // Keep max 10
+        localStorage.setItem('coolaRecent', JSON.stringify(recents));
+    }
+
+    // Tab Switching
+    function switchTab(tab) {
+        currentTab = tab;
+        document.getElementById('dashboard').classList.remove('hidden');
+        document.getElementById('player').style.display = 'none';
+        document.getElementById('top-header').classList.remove('hidden');
+
+        let displayList = [];
+        if (tab === 'all') { document.getElementById('tab-title').innerHTML = "🎮 All Games"; displayList = allGames; }
+        if (tab === 'favs') { document.getElementById('tab-title').innerHTML = "⭐ Favorites"; displayList = allGames.filter(g => favorites.includes(g.title)); }
+        if (tab === 'recent') { document.getElementById('tab-title').innerHTML = "🕒 Recently Played"; displayList = recents; }
+        
+        renderGrid(displayList);
+    }
+
+    // Feature 10: Smart Launch (Games or Proxy)
+    function launchGame(game) {
+        addToRecent(game);
+        launchProxy(game.url);
+    }
+
+    function launchProxy(url) {
+        document.getElementById('dashboard').classList.add('hidden');
+        document.getElementById('top-header').classList.add('hidden');
+        const player = document.getElementById('player');
+        player.style.display = 'flex';
+        
+        // Routes through Firebase Proxy
+        document.getElementById('game-frame').src = `/p?url=${encodeURIComponent(url)}`;
+    }
+
+    function closePlayer() {
+        document.getElementById('game-frame').src = "";
+        switchTab(currentTab);
+    }
+
+    // Search Handler
+    function handleSearch(e) {
+        const val = e.target.value;
+        if (e.key === 'Enter') {
+            if (val.includes('.') && !val.includes(' ')) {
+                launchProxy(val.startsWith('http') ? val : 'https://' + val);
+            }
+        } else {
+            if(currentTab !== 'all') switchTab('all');
+            const filtered = allGames.filter(g => g.title.toLowerCase().includes(val.toLowerCase()));
+            renderGrid(filtered);
         }
+    }
 
-        loadGames();
-    </script>
+    // Feature 6: Fullscreen
+    function toggleFullscreen() {
+        const frame = document.getElementById('game-frame');
+        if (frame.requestFullscreen) { frame.requestFullscreen(); }
+        else if (frame.webkitRequestFullscreen) { frame.webkitRequestFullscreen(); }
+    }
+
+    // Feature 2: Panic Button
+    document.addEventListener('keydown', (e) => {
+        if (e.key === ']') {
+            window.location.replace('https://classroom.google.com');
+        }
+    });
+
+    // Feature 7: Theme Switcher
+    const themes = ['dark', 'ocean', 'hacker'];
+    let themeIndex = 0;
+    function cycleTheme() {
+        themeIndex = (themeIndex + 1) % themes.length;
+        document.documentElement.setAttribute('data-theme', themes[themeIndex]);
+    }
+
+    // Feature 8: Live Clock
+    function startClock() {
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], { hour12: true });
+        }, 1000);
+    }
+
+    init();
+</script>
 </body>
 </html>
