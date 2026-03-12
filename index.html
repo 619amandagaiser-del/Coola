@@ -1,248 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classes</title> <link id="favicon" rel="icon" href="https://www.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png"> <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&display=swap');
+<meta charset="UTF-8">
+<title>Starship</title>
 
-        :root {
-            --bg: #050505;
-            --surface: #111111;
-            --accent: #007aff;
-            --text: #ffffff;
-            --glass: rgba(255, 255, 255, 0.03);
-        }
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#111;
+color:white;
+}
 
-        body {
-            margin: 0;
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Outfit', sans-serif;
-            overflow-x: hidden;
-        }
+nav{
+background:#000;
+padding:10px;
+display:flex;
+gap:10px;
+}
 
-        /* Loading Screen (Poki Style) */
-        #loader {
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            transition: opacity 0.5s ease;
-        }
+button{
+background:#222;
+border:none;
+color:white;
+padding:8px 12px;
+cursor:pointer;
+}
 
-        .bar-container {
-            width: 200px;
-            height: 4px;
-            background: #222;
-            border-radius: 10px;
-            margin-top: 20px;
-            overflow: hidden;
-        }
+.page{
+display:none;
+padding:20px;
+}
 
-        .bar-fill {
-            width: 0%;
-            height: 100%;
-            background: var(--accent);
-            box-shadow: 0 0 15px var(--accent);
-            animation: load 2s forwards;
-        }
+.active{
+display:block;
+}
+</style>
 
-        @keyframes load { to { width: 100%; } }
-
-        /* Navigation */
-        nav {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 40px;
-            background: rgba(10, 10, 10, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .search-wrapper {
-            background: var(--glass);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 50px;
-            padding: 8px 20px;
-            display: flex;
-            align-items: center;
-            width: 40%;
-            transition: 0.3s;
-        }
-
-        .search-wrapper:focus-within { border-color: var(--accent); width: 45%; }
-
-        input {
-            background: transparent;
-            border: none;
-            color: white;
-            width: 100%;
-            outline: none;
-            font-size: 1rem;
-        }
-
-        /* Hero Section */
-        .hero {
-            padding: 60px 40px 20px;
-            text-align: left;
-        }
-
-        .hero h1 { font-size: 3rem; font-weight: 900; margin: 0; background: linear-gradient(to right, #fff, #666); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        /* Game Grid */
-        .container { padding: 20px 40px; }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 25px;
-        }
-
-        .card {
-            background: var(--surface);
-            border-radius: 20px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid var(--glass);
-            position: relative;
-        }
-
-        .card:hover {
-            transform: scale(1.05) translateY(-5px);
-            border-color: var(--accent);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-
-        .thumb {
-            width: 100%;
-            aspect-ratio: 1/1;
-            background: #1a1a1a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-        }
-
-        .info { padding: 15px; font-weight: 600; font-size: 0.95rem; text-align: center; }
-
-        /* Badge System */
-        .badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: var(--accent);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            font-weight: 900;
-        }
-    </style>
 </head>
 <body>
 
-<div id="loader">
-    <h2 style="letter-spacing: 5px;">SHADOW V3</h2>
-    <div class="bar-container"><div class="bar-fill"></div></div>
-</div>
-
 <nav>
-    <div style="font-weight: 900; font-size: 1.5rem; color: var(--accent);">SHADOW</div>
-    <div class="search-wrapper">
-        <input type="text" id="search" placeholder="Search unblocked library..." onkeyup="filter()">
-    </div>
-    <div id="status" style="font-size: 0.8rem; color: #444;">System: Operational</div>
+<button onclick="showPage('home')">Home</button>
+<button onclick="showPage('games')">Games</button>
+<button onclick="showPage('tv')">TV</button>
+<button onclick="showPage('profile')">Profile</button>
+<button onclick="showPage('settings')">Settings</button>
 </nav>
 
-<div class="hero">
-    <h1>Recommended for You</h1>
+<div id="home" class="page active">
+<h1>Welcome to Starship</h1>
 </div>
 
-<div class="container">
-    <div class="grid" id="grid"></div>
+<div id="games" class="page">
+<h1>Games</h1>
+</div>
+
+<div id="tv" class="page">
+<h1>TV</h1>
+</div>
+
+<div id="profile" class="page">
+<h1>Profile</h1>
+</div>
+
+<div id="settings" class="page">
+<h1>Settings</h1>
 </div>
 
 <script>
-    // Professional Game Database (Use Githack for self-hosted files)
-    const games = [
-        { name: "Minecraft", icon: "⛏️", url: "https://classic.minecraft.net/", tag: "Popular" },
-        { name: "Slope", icon: "🏂", url: "https://kbhgames.com/game/slope", tag: "Hot" },
-        { name: "1v1.LOL", icon: "🔫", url: "https://1v1.lol/", tag: "Multiplayer" },
-        { name: "BitLife", icon: "💼", url: "https://bitlifeonline.io/", tag: "Simulation" },
-        { name: "Retro Bowl", icon: "🏈", url: "https://poki.com/en/g/retro-bowl", tag: "Sports" },
-        { name: "Subway Surfers", icon: "🏃", url: "https://subwaysurfers.com/", tag: "New" }
-    ];
-
-    function render(data) {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = data.map(g => `
-            <div class="card" onclick="launch('${g.url}')">
-                <div class="badge">${g.tag}</div>
-                <div class="thumb">${g.icon}</div>
-                <div class="info">${g.name}</div>
-            </div>
-        `).join('');
-    }
-
-    // Technique: Advanced About:Blank Cloaking
-    function launch(url) {
-        // Use your Vercel Proxy
-        const proxyUrl = window.location.origin + `/p?url=${encodeURIComponent(url)}`;
-        
-        const win = window.open('about:blank', '_blank');
-        if (!win || win.closed) {
-            alert('Popup blocked! Please allow popups for this site.');
-            return;
-        }
-
-        win.document.title = "Google Docs"; // Tab cloak inside the game
-        win.document.body.style.margin = '0';
-        win.document.body.style.height = '100vh';
-        
-        const iframe = win.document.createElement('iframe');
-        iframe.style.border = 'none';
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.style.background = '#000';
-        iframe.src = proxyUrl;
-        
-        win.document.body.appendChild(iframe);
-    }
-
-    // Technique: Panic Button (Double-Tap Escape)
-    let escCount = 0;
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            escCount++;
-            setTimeout(() => escCount = 0, 500);
-            if (escCount === 2) window.location.href = "https://classroom.google.com";
-        }
-    });
-
-    // Handle Search
-    function filter() {
-        const val = document.getElementById('search').value.toLowerCase();
-        render(games.filter(g => g.name.toLowerCase().includes(val)));
-    }
-
-    // Loader Timeout
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            document.getElementById('loader').style.opacity = '0';
-            setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
-        }, 2000);
-    });
-
-    render(games);
+function showPage(page){
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+document.getElementById(page).classList.add("active");
+}
 </script>
+
 </body>
 </html>
