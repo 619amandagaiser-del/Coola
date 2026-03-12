@@ -2,287 +2,457 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Starship Portal</title>
+<title>Starship Infinity</title>
 
 <style>
 
-:root{
---bg:#111;
---card:#1e1e1e;
---accent:#4da3ff;
---text:white;
-}
-
 body{
 margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:var(--bg);
-color:var(--text);
-}
-
-header{
-background:black;
-padding:16px;
-font-size:24px;
-text-align:center;
-font-weight:bold;
-}
-
-nav{
-display:flex;
-gap:10px;
-padding:10px;
-background:#1a1a1a;
-justify-content:center;
-flex-wrap:wrap;
-}
-
-button{
-background:#333;
-border:none;
+font-family:Arial;
+background:#050915;
 color:white;
-padding:10px 16px;
-border-radius:8px;
-cursor:pointer;
+overflow:hidden;
 }
 
-button:hover{
-background:#555;
-}
+/* desktop */
 
-.page{
-display:none;
+#desktop{
+position:absolute;
+top:0;
+left:0;
+right:0;
+bottom:50px;
 padding:20px;
 }
 
-.active{
-display:block;
-}
+/* icons */
 
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:15px;
-margin-top:20px;
-}
-
-.card{
-background:var(--card);
-padding:15px;
-border-radius:10px;
+.icon{
+display:inline-block;
+width:90px;
 text-align:center;
+margin:12px;
+cursor:pointer;
 }
 
-.card iframe{
-width:100%;
-height:150px;
+/* taskbar */
+
+#taskbar{
+position:absolute;
+bottom:0;
+left:0;
+right:0;
+height:50px;
+background:#0c1022;
+display:flex;
+align-items:center;
+gap:10px;
+padding:6px;
+}
+
+#search{
+padding:6px;
+border-radius:5px;
 border:none;
 }
 
-input{
+/* windows */
+
+.window{
+position:absolute;
+width:680px;
+height:420px;
+background:#121633;
+border:1px solid #333;
+border-radius:8px;
+display:none;
+flex-direction:column;
+}
+
+.titlebar{
+background:#1b2050;
+padding:8px;
+display:flex;
+justify-content:space-between;
+cursor:move;
+}
+
+.controls button{
+background:#333;
+margin-left:5px;
+}
+
+.content{
+flex:1;
+padding:10px;
+overflow:auto;
+}
+
+/* ui */
+
+button{
+padding:6px 10px;
+border:none;
+background:#3d4fc7;
+color:white;
+border-radius:5px;
+cursor:pointer;
+}
+
+input,textarea{
+padding:6px;
+border:none;
+border-radius:4px;
+}
+
+iframe{
+width:100%;
+height:100%;
+border:none;
+}
+
+canvas{
+border:1px solid white;
+}
+
+/* notifications */
+
+#notify{
+position:absolute;
+top:10px;
+right:10px;
+background:#1b2050;
 padding:10px;
 border-radius:6px;
-border:none;
-width:250px;
-}
-
-video{
-max-width:100%;
-border-radius:10px;
+display:none;
 }
 
 </style>
-
 </head>
+
 <body>
 
-<header>🚀 Starship Portal</header>
+<div id="notify"></div>
 
-<nav>
+<div id="desktop">
 
-<button onclick="showPage('home')">Home</button>
-<button onclick="showPage('games')">Games</button>
-<button onclick="showPage('tv')">TV</button>
-<button onclick="showPage('search')">Search</button>
-<button onclick="showPage('profile')">Profile</button>
-<button onclick="showPage('settings')">Settings</button>
+<div class="icon" onclick="openApp('games')">🎮<div>Games</div></div>
+<div class="icon" onclick="openApp('browser')">🌐<div>Browser</div></div>
+<div class="icon" onclick="openApp('notes')">📝<div>Notes</div></div>
+<div class="icon" onclick="openApp('music')">🎵<div>Music</div></div>
+<div class="icon" onclick="openApp('bookmarks')">⭐<div>Bookmarks</div></div>
+<div class="icon" onclick="openApp('draw')">🎨<div>Draw</div></div>
+<div class="icon" onclick="openApp('drive')">📁<div>Drive</div></div>
+<div class="icon" onclick="openApp('system')">📊<div>System</div></div>
 
-</nav>
-
-<!-- HOME -->
-
-<div id="home" class="page active">
-
-<h2>Welcome</h2>
-<p>Your all-in-one web portal.</p>
-
-<div class="grid">
-
-<div class="card">
-<h3>🎮 Games</h3>
-<p>Play browser games</p>
-<button onclick="showPage('games')">Open</button>
 </div>
 
-<div class="card">
-<h3>📺 TV</h3>
-<p>Watch videos</p>
-<button onclick="showPage('tv')">Open</button>
+<div id="taskbar">
+
+🚀 Starship Infinity
+
+<input id="search" placeholder="Search apps">
+
 </div>
 
-<div class="card">
-<h3>🔎 Search</h3>
-<p>Search the web</p>
-<button onclick="showPage('search')">Open</button>
+<!-- browser -->
+
+<div class="window" id="browser">
+
+<div class="titlebar">
+
+Browser
+
+<div class="controls">
+<button onclick="minimize(this)">_</button>
+<button onclick="closeWin(this)">X</button>
 </div>
 
 </div>
 
-</div>
+<div class="content">
 
-<!-- GAMES -->
+<input id="url">
+<button onclick="go()">Go</button>
 
-<div id="games" class="page">
-
-<h2>🎮 Games</h2>
-
-<div class="grid">
-
-<div class="card">
-<h3>Tetris</h3>
-<iframe src="https://tetris.com/play-tetris"></iframe>
-</div>
-
-<div class="card">
-<h3>Pacman</h3>
-<iframe src="https://freepacman.org"></iframe>
-</div>
-
-<div class="card">
-<h3>Snake</h3>
-<iframe src="https://playsnake.org"></iframe>
-</div>
+<iframe id="web"></iframe>
 
 </div>
 
 </div>
 
-<!-- TV -->
+<!-- games -->
 
-<div id="tv" class="page">
+<div class="window" id="games">
 
-<h2>📺 Video Player</h2>
+<div class="titlebar">
 
-<video controls>
+Games
 
-<source src="" type="video/mp4">
-
-</video>
-
-<p>You can add your own videos by editing the source.</p>
+<div class="controls">
+<button onclick="minimize(this)">_</button>
+<button onclick="closeWin(this)">X</button>
+</div>
 
 </div>
 
-<!-- SEARCH -->
+<div class="content">
 
-<div id="search" class="page">
+<button onclick="play('https://playsnake.org')">Snake</button>
+<button onclick="play('https://tetris.com/play-tetris')">Tetris</button>
 
-<h2>🔎 Search</h2>
-
-<input id="searchInput" placeholder="Search Google">
-
-<button onclick="doSearch()">Search</button>
+<iframe id="gameFrame"></iframe>
 
 </div>
 
-<!-- PROFILE -->
+</div>
 
-<div id="profile" class="page">
+<!-- notes -->
 
-<h2>👤 Profile</h2>
+<div class="window" id="notes">
 
-<input id="nameInput" placeholder="Enter your name">
+<div class="titlebar">
 
-<button onclick="saveProfile()">Save</button>
+Notes
 
-<p id="profileName"></p>
+<div class="controls">
+<button onclick="minimize(this)">_</button>
+<button onclick="closeWin(this)">X</button>
+</div>
 
 </div>
 
-<!-- SETTINGS -->
+<div class="content">
 
-<div id="settings" class="page">
+<textarea id="noteArea" style="width:100%;height:80%"></textarea>
 
-<h2>⚙️ Settings</h2>
+</div>
 
-<button onclick="toggleTheme()">Toggle Dark / Light</button>
+</div>
+
+<!-- music -->
+
+<div class="window" id="music">
+
+<div class="titlebar">
+
+Music
+
+<div class="controls">
+<button onclick="minimize(this)">_</button>
+<button onclick="closeWin(this)">X</button>
+</div>
+
+</div>
+
+<div class="content">
+
+<audio controls>
+<source src="">
+</audio>
+
+</div>
+
+</div>
+
+<!-- bookmarks -->
+
+<div class="window" id="bookmarks">
+
+<div class="titlebar">
+
+Bookmarks
+
+<div class="controls">
+<button onclick="minimize(this)">_</button>
+<button onclick="closeWin(this)">X</button>
+</div>
+
+</div>
+
+<div class="content">
+
+<input id="bm">
+<button onclick="addBookmark()">Add</button>
+
+<div id="bmlist"></div>
+
+</div>
+
+</div>
+
+<!-- draw -->
+
+<div class="window" id="draw">
+
+<div class="titlebar">
+
+Draw
+
+<div class="controls">
+<button onclick="minimize(this)">_</button>
+<button onclick="closeWin(this)">X</button>
+</div>
+
+</div>
+
+<div class="content">
+
+<canvas id="canvas" width="500" height="300"></canvas>
+
+</div>
+
+</div>
+
+<!-- drive -->
+
+<div class="window" id="drive">
+
+<div class="titlebar">
+
+Drive Viewer
+
+<div class="controls">
+<button onclick="minimize(this)">_</button>
+<button onclick="closeWin(this)">X</button>
+</div>
+
+</div>
+
+<div class="content">
+
+<input id="driveLink" placeholder="Drive link">
+<button onclick="openDrive()">Open</button>
+
+<iframe id="driveFrame"></iframe>
+
+</div>
+
+</div>
+
+<!-- system -->
+
+<div class="window" id="system">
+
+<div class="titlebar">
+
+System Info
+
+<div class="controls">
+<button onclick="minimize(this)">_</button>
+<button onclick="closeWin(this)">X</button>
+</div>
+
+</div>
+
+<div class="content">
+
+<p id="info"></p>
+
+</div>
 
 </div>
 
 <script>
 
-function showPage(page){
+/* notifications */
 
-document.querySelectorAll(".page").forEach(p=>{
-p.classList.remove("active");
-})
+function notify(msg){
+let n=document.getElementById("notify")
+n.innerText=msg
+n.style.display="block"
+setTimeout(()=>n.style.display="none",3000)
+}
 
-document.getElementById(page).classList.add("active")
+/* open window */
+
+function openApp(id){
+let w=document.getElementById(id)
+w.style.display="flex"
+w.style.left="150px"
+w.style.top="120px"
+notify(id+" opened")
+}
+
+/* window controls */
+
+function closeWin(btn){
+btn.closest(".window").style.display="none"
+}
+
+function minimize(btn){
+btn.closest(".window").style.display="none"
+}
+
+/* browser */
+
+function go(){
+let q=document.getElementById("url").value
+if(!q.startsWith("http"))
+q="https://www.google.com/search?q="+q
+document.getElementById("web").src=q
+}
+
+/* games */
+
+function play(url){
+document.getElementById("gameFrame").src=url
+}
+
+/* notes autosave */
+
+let note=document.getElementById("noteArea")
+
+note.value=localStorage.getItem("notes")||""
+
+note.oninput=()=>{
+localStorage.setItem("notes",note.value)
+}
+
+/* bookmarks */
+
+function addBookmark(){
+
+let url=document.getElementById("bm").value
+let list=document.getElementById("bmlist")
+
+list.innerHTML+="<div>"+url+"</div>"
 
 }
 
-function doSearch(){
+/* drive */
 
-let q=document.getElementById("searchInput").value
+function openDrive(){
 
-window.open("https://www.google.com/search?q="+encodeURIComponent(q))
+let link=document.getElementById("driveLink").value
+let id=link.split("/d/")[1]?.split("/")[0]
 
-}
+let embed="https://drive.google.com/file/d/"+id+"/preview"
 
-function saveProfile(){
-
-let name=document.getElementById("nameInput").value
-
-localStorage.setItem("starshipName",name)
-
-loadProfile()
+document.getElementById("driveFrame").src=embed
 
 }
 
-function loadProfile(){
+/* drawing */
 
-let name=localStorage.getItem("starshipName")
+let canvas=document.getElementById("canvas")
+let ctx=canvas.getContext("2d")
+let draw=false
 
-if(name){
+canvas.onmousedown=()=>draw=true
+canvas.onmouseup=()=>draw=false
 
-document.getElementById("profileName").innerText="Hello "+name
-
+canvas.onmousemove=e=>{
+if(!draw) return
+ctx.fillRect(e.offsetX,e.offsetY,3,3)
 }
 
-}
+/* system info */
 
-function toggleTheme(){
-
-let root=document.documentElement
-
-if(root.style.getPropertyValue("--bg")=="white"){
-
-root.style.setProperty("--bg","#111")
-root.style.setProperty("--text","white")
-
-}else{
-
-root.style.setProperty("--bg","white")
-root.style.setProperty("--text","black")
-
-}
-
-}
-
-loadProfile()
+document.getElementById("info").innerText =
+"User Agent: "+navigator.userAgent
 
 </script>
 
 </body>
-</html
+</html>
